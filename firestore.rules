@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidMerchant(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && (data.address == null || data.address is string)
+        && data.lat is number && data.lat >= -90.0 && data.lat <= 90.0
+        && data.lng is number && data.lng >= -180.0 && data.lng <= 180.0
+        && (data.phone == null || data.phone is string)
+        && (data.notes == null || data.notes is string);
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection test doc
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // Merchants collection
+    match /merchants/{merchantId} {
+      allow read: if true;
+      allow create, update: if isValidId(merchantId) && isValidMerchant(request.resource.data);
+      allow delete: if isValidId(merchantId);
+    }
+  }
+}

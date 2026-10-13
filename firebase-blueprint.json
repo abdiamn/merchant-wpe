@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "Merchant": {
+      "title": "Merchant",
+      "description": "Represents a merchant or store location record",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Merchant business name",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "address": {
+          "type": "string",
+          "description": "Physical address for geocoding and routing",
+          "maxLength": 500
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitude coordinate (-90 to 90, 0 if pending address mapping)"
+        },
+        "lng": {
+          "type": "number",
+          "description": "Longitude coordinate (-180 to 180, 0 if pending address mapping)"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number",
+          "maxLength": 50
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional remarks or notes",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp when record was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp when record was last updated"
+        }
+      },
+      "required": ["name", "lat", "lng"]
+    }
+  },
+  "firestore": {
+    "/merchants/{merchantId}": {
+      "schema": "#/entities/Merchant",
+      "description": "Collection of merchants and their mapped location coordinates"
+    }
+  }
+}

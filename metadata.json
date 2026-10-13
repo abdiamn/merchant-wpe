@@ -1,0 +1,6 @@
+{
+  "name": "Merchant Map Pro - Makassar & Nationwide Location Mapping",
+  "description": "Aplikasi pemetaan lokasi merchant interaktif dengan import/export Excel, rute navigasi Google Maps, KML MyMaps, auto-geocoding, dan manajemen titik lokasi.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
