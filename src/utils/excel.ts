@@ -77,17 +77,21 @@ export async function parseExcelFile(file: File): Promise<ParsedMerchantRow[]> {
       const cleanKey = key.trim().toLowerCase();
       const valStr = String(val).trim();
 
-      if (['nama', 'name', 'merchant', 'nama merchant', 'merchant name', 'store', 'toko'].includes(cleanKey)) {
+      const normalizedKey = cleanKey.replace(/[_\-\s]+/g, ' ').trim();
+
+      if (['nama', 'name', 'merchant', 'nama merchant', 'merchant name', 'store', 'toko', 'nama toko', 'nama lokasi'].includes(normalizedKey)) {
         name = valStr;
-      } else if (['alamat', 'address', 'lokasi', 'location'].includes(cleanKey)) {
+      } else if (['alamat', 'address', 'lokasi', 'location', 'alamat lengkap', 'alamat merchant'].includes(normalizedKey)) {
         address = valStr;
-      } else if (['latitude', 'lat', 'lintang', 'y'].includes(cleanKey)) {
-        const num = parseFloat(valStr);
+      } else if (['latitude', 'lat', 'lintang', 'y', 'lat y', 'latitude y', 'koordinat y'].includes(normalizedKey)) {
+        const cleanNumStr = valStr.replace(',', '.');
+        const num = parseFloat(cleanNumStr);
         if (!isNaN(num)) lat = num;
-      } else if (['longitude', 'lng', 'lon', 'long', 'bujur', 'x'].includes(cleanKey)) {
-        const num = parseFloat(valStr);
+      } else if (['longitude', 'lng', 'lon', 'long', 'bujur', 'x', 'lng x', 'longitude x', 'koordinat x'].includes(normalizedKey)) {
+        const cleanNumStr = valStr.replace(',', '.');
+        const num = parseFloat(cleanNumStr);
         if (!isNaN(num)) lng = num;
-      } else if (['telepon', 'phone', 'telp', 'no telepon', 'no hp', 'kontak', 'contact', 'whatsapp', 'wa'].includes(cleanKey)) {
+      } else if (['telepon', 'phone', 'telp', 'no telepon', 'no telp', 'no hp', 'nomor telepon', 'kontak', 'contact', 'whatsapp', 'wa'].includes(normalizedKey)) {
         phone = valStr;
       }
     }

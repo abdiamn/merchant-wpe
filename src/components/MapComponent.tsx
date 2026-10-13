@@ -125,7 +125,16 @@ export const MapComponent: React.FC<MapComponentProps> = ({
     mapInstanceRef.current = map;
     onMapReadyRef?.(map);
 
+    // ResizeObserver to handle container size changes (fixes Leaflet gray tiles)
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -243,6 +252,30 @@ export const MapComponent: React.FC<MapComponentProps> = ({
         </div>
       `;
 
+      // Attach direct click handlers to buttons inside popupHtml DOM element
+      const editBtn = popupHtml.querySelector<HTMLButtonElement>(`#edit-btn-${m.id}`);
+      const deleteBtn = popupHtml.querySelector<HTMLButtonElement>(`#delete-btn-${m.id}`);
+
+      if (editBtn) {
+        editBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          marker.closePopup();
+          onEditMerchant(m);
+        };
+      }
+
+      if (deleteBtn) {
+        deleteBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          marker.closePopup();
+          if (confirm(`Yakin ingin menghapus "${m.name}"?`)) {
+            onDeleteMerchant(m.id);
+          }
+        };
+      }
+
       marker.bindPopup(popupHtml, {
         maxWidth: 320,
         className: 'rounded-xl shadow-xl'
@@ -250,24 +283,6 @@ export const MapComponent: React.FC<MapComponentProps> = ({
 
       marker.on('popupopen', () => {
         onSelectMerchant(m.id);
-        const editBtn = document.getElementById(`edit-btn-${m.id}`);
-        const deleteBtn = document.getElementById(`delete-btn-${m.id}`);
-        if (editBtn) {
-          editBtn.onclick = (e) => {
-            e.preventDefault();
-            marker.closePopup();
-            onEditMerchant(m);
-          };
-        }
-        if (deleteBtn) {
-          deleteBtn.onclick = (e) => {
-            e.preventDefault();
-            marker.closePopup();
-            if (confirm(`Yakin ingin menghapus "${m.name}"?`)) {
-              onDeleteMerchant(m.id);
-            }
-          };
-        }
       });
 
       marker.on('click', () => {

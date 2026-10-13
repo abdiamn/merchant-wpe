@@ -118,6 +118,24 @@ export async function batchSaveMerchantsToDb(merchants: Merchant[]): Promise<num
 }
 
 /**
+ * Clear all merchants from Firestore collection
+ */
+export async function clearAllMerchantsInDb(): Promise<void> {
+  const querySnapshot = await getDocs(collection(db, MERCHANTS_COLLECTION));
+  const chunkSize = 450;
+  const docs = querySnapshot.docs;
+
+  for (let i = 0; i < docs.length; i += chunkSize) {
+    const chunk = docs.slice(i, i + chunkSize);
+    const batch = writeBatch(db);
+    chunk.forEach((docSnapshot) => {
+      batch.delete(docSnapshot.ref);
+    });
+    await batch.commit();
+  }
+}
+
+/**
  * Update single merchant coordinates (e.g. after address mapping)
  */
 export async function updateMerchantCoordinates(id: string, lat: number, lng: number): Promise<void> {

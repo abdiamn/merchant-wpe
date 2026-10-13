@@ -84,7 +84,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
             </h4>
 
             {/* Bug 1 */}
-            <div className="border border-rose-200 bg-rose-50/50 rounded-xl p-3.5 space-y-1.5">
+            <div className="border border-rose-200 bg-rose-50/50 rounded-xl p-3.5 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-rose-900 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-rose-500" />
@@ -93,17 +93,50 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                 <span className="px-1.5 py-0.5 rounded text-[10px] bg-rose-200 text-rose-800 font-mono">Bug Kritis</span>
               </div>
               <p className="text-slate-700">
-                Pada fungsi <code className="bg-rose-100 text-rose-900 px-1 py-0.5 rounded font-mono">lookupCoordinatesByName()</code> di JavaScript Anda:
+                Pada file GitHub Anda, fungsi <code className="bg-rose-100 text-rose-900 px-1 py-0.5 rounded font-mono">lookupCoordinatesByName()</code> tidak memiliki kata kunci <code className="font-mono font-bold">async</code>, sehingga pemanggilan <code className="font-mono font-bold">await geocodeMakassar</code> memicu <em>SyntaxError</em> dan tombol crash.
               </p>
-              <pre className="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[11px] overflow-x-auto">
-{`// KODE LAMA ANDA:
-function lookupCoordinatesByName() { // <--- Kurang kata kunci 'async'!
-    const coord = await geocodeMakassar(nameInput, addressInput);
-    // SyntaxError: await is only valid in async functions
-}`}
-              </pre>
+              
+              <div className="bg-slate-900 text-slate-100 p-3 rounded-lg font-mono text-[11px] overflow-x-auto relative">
+                <div className="text-slate-400 text-[10px] mb-1 pb-1 border-b border-slate-800 flex justify-between items-center">
+                  <span>Kode yang sudah diperbaiki (siap copas ke repo GitHub):</span>
+                </div>
+                <pre>{`async function lookupCoordinatesByName() {
+    const nameInput = document.getElementById('merchantName').value.trim();
+    const addressInput = document.getElementById('merchantAddress').value.trim();
+    const query = (addressInput || nameInput);
+    if (!query) {
+        alert('Silakan masukkan Nama atau Alamat merchant terlebih dahulu.');
+        return;
+    }
+
+    const searchBtn = event.target;
+    const originalText = searchBtn.innerText;
+    searchBtn.innerText = '⏳ Mencari...';
+    searchBtn.disabled = true;
+
+    try {
+        const coord = await geocodeMakassar(nameInput, addressInput);
+        if (coord) {
+            document.getElementById('merchantLat').value = coord.lat;
+            document.getElementById('merchantLng').value = coord.lng;
+            if (!addressInput && coord.display_name) {
+                document.getElementById('merchantAddress').value = coord.display_name;
+            }
+            alert(\`✅ Lokasi ditemukan di Makassar!\\nLatitude: \${coord.lat}\\nLongitude: \${coord.lng}\`);
+        } else {
+            alert(\`⚠️ Lokasi "\${query}" tidak ditemukan di Makassar. Silakan cek Google Maps atau masukkan manual.\`);
+        }
+    } catch (err) {
+        alert('Gagal mencari lokasi: ' + err.message);
+    } finally {
+        searchBtn.innerText = originalText;
+        searchBtn.disabled = false;
+    }
+}`}</pre>
+              </div>
+
               <p className="text-emerald-700 font-medium">
-                ✅ <strong>Solusi:</strong> Tambahkan kata kunci <code className="bg-emerald-100 text-emerald-900 px-1 py-0.5 rounded font-mono">async function lookupCoordinatesByName()</code>. Di aplikasi versi Pro ini sudah kami perbaiki dan tambahkan indikator loading.
+                ✅ <strong>Status di Aplikasi ini:</strong> Sudah 100% diperbaiki, terintegrasi dengan Firestore Database, dan dilengkapi tombol bantuan pencarian Google Maps serta ekstraksi koordinat otomatis.
               </p>
             </div>
 

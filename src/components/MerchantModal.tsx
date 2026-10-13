@@ -145,11 +145,11 @@ export const MerchantModal: React.FC<MerchantModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const latNum = parseFloat(lat);
-    const lngNum = parseFloat(lng);
+    const latNum = lat.trim() === '' ? 0 : parseFloat(lat);
+    const lngNum = lng.trim() === '' ? 0 : parseFloat(lng);
 
-    if (isNaN(latNum) || isNaN(lngNum)) {
-      alert('Mohon masukkan Latitude dan Longitude yang valid.');
+    if (isNaN(latNum) || isNaN(lngNum) || latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+      alert('Format angka koordinat tidak valid. Nilai Latitude harus antara -90 s/d 90 dan Longitude antara -180 s/d 180 (atau kosongkan untuk 0).');
       return;
     }
 
@@ -301,26 +301,24 @@ export const MerchantModal: React.FC<MerchantModalProps> = ({
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[11px] font-medium text-slate-600 mb-0.5">Latitude *</label>
+                <label className="block text-[11px] font-medium text-slate-600 mb-0.5">Latitude (Opsional / 0)</label>
                 <input
                   type="number"
                   step="any"
-                  required
                   value={lat}
                   onChange={(e) => setLat(e.target.value)}
-                  placeholder="-5.1443"
+                  placeholder="0 atau -5.1443"
                   className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-600 mb-0.5">Longitude *</label>
+                <label className="block text-[11px] font-medium text-slate-600 mb-0.5">Longitude (Opsional / 0)</label>
                 <input
                   type="number"
                   step="any"
-                  required
                   value={lng}
                   onChange={(e) => setLng(e.target.value)}
-                  placeholder="119.4081"
+                  placeholder="0 atau 119.4081"
                   className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                 />
               </div>

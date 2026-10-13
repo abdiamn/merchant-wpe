@@ -17,6 +17,7 @@ import {
   saveMerchantToDb, 
   deleteMerchantFromDb, 
   batchSaveMerchantsToDb, 
+  clearAllMerchantsInDb,
   updateMerchantCoordinates,
   testFirestoreConnection 
 } from './firebase';
@@ -203,6 +204,13 @@ export default function App() {
     let nextList: Merchant[];
     if (mode === 'replace') {
       nextList = newMerchants;
+      if (isDbConnected) {
+        try {
+          await clearAllMerchantsInDb();
+        } catch (err) {
+          console.error('Error clearing old records from Firestore:', err);
+        }
+      }
     } else {
       nextList = [...newMerchants, ...merchants];
     }
@@ -316,7 +324,12 @@ export default function App() {
       setSelectedMerchantId(null);
       handleResetView();
       if (isDbConnected) {
-        await batchSaveMerchantsToDb(INITIAL_MERCHANTS);
+        try {
+          await clearAllMerchantsInDb();
+          await batchSaveMerchantsToDb(INITIAL_MERCHANTS);
+        } catch (err) {
+          console.error('Error resetting database:', err);
+        }
       }
     }
   };

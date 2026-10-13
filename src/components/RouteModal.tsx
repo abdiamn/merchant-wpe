@@ -24,10 +24,14 @@ export const RouteModal: React.FC<RouteModalProps> = ({
   onClose,
   merchants
 }) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>(() => 
-    merchants.slice(0, 10).map(m => m.id)
-  );
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setSelectedIds(merchants.slice(0, 10).map(m => m.id));
+    }
+  }, [isOpen, merchants]);
 
   if (!isOpen) return null;
 
